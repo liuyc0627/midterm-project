@@ -1,0 +1,85 @@
+---
+title: "Group11 Presentation"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+
+library(kableExtra)
+library(jtools)
+library(huxtable)
+library(tinytex)
+```
+
+## Introduction 
+
+- USDA Data on pesticides used on strawberries for California, Florida, Oregon, and Washington, from 2016 - 2019
+- Toxicity records on different toxins 
+- Our question: If the toxicity level of toxins would leave to lower usage of toxins in terms of lbs?
+
+```{r data, echo = F, warning = F, include = F}
+## source in data 
+source("wrangling_data.R", echo = T, prompt.echo = "", spaced = F)
+```
+
+## Florida has the highest usage of toxins in lbs measurement, and the toxicity level is low
+
+- Lowest lbs usage of pesticides in Florida in 2018
+- Highest lbs usage of pesticides in Florida in 2016 
+
+```{r tabl1, echo = FALSE}
+tb1 <- agg_df2 %>% 
+  filter(measure == "APPLICATIONS, MEASURED IN LB")%>%
+  filter(toxicity_level!="")%>%
+  group_by(State, Year,toxicity_level)%>%
+  summarise(value = mean(Value))%>%
+  kbl(caption = "Table 1.Absolute usaged of chemicals at different toxicity level by year") %>%
+  kable_classic_2(full_width = F)
+tb1
+```
+
+## California has more pesticides used are measured in lbs on strawberries 
+
+- While Florida has much lower number for pesticides used are measured in lbs 
+- Most pesticides used in California are either no toxins or low toxins
+
+```{r table2, echo=FALSE}
+tb2 <- agg_df2 %>%
+  filter(measure == "APPLICATIONS, MEASURED IN LB")%>%
+  filter(toxicity_level!="")%>%
+  group_by(State, toxicity_level)%>%
+  summarise(n = n())%>%
+  spread(toxicity_level,n)%>%
+  kbl(caption = "Table 2.Total count of chemicals all used in absoluate LB by state and toxicity levels") %>%
+  kable_classic_2(full_width = F)
+tb2
+```
+
+## Florida has the highest average lbs pesticides used 
+
+```{r map, echo=FALSE}
+p <- ggplot(data = toxicity_val,
+           aes(x = long, y = lat,
+               group = group, fill = value))+
+      geom_polygon(color = "gray90", size = 0.1) +
+      coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+      ggtitle("Map-average usaged of toxins")
+p
+```
+
+
+## Modeling: is there a relationship on toxicity and usage of pesticides (measured in lbs)?
+
+```{r model}
+fit <- lm(Value ~ toxicity_humanbee_cat+toxicity_level_cat, data = agg_df2)
+summ(fit)
+```
+
+## Conclusion 
+
+- No clear relationship between toxicity/toxicity level and usaged of pesticides (measured in lbs)
+
+- Future imrovement: 
+1. More data; 
+2. Include natural environment variables 
+3. Using proportional usage of pesticides 
