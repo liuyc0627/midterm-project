@@ -1,0 +1,25 @@
+install.packages("shiny")
+library(shiny)
+library(tidyverse)
+ui <- fluidPage(
+  
+  titlePanel("Strawberries"))
+server <- function(input, output, session) {
+}    
+shinyApp(ui, server)
+
+work_data <- agg_df2 %>%
+  filter(toxicity_level_cat!="") %>%
+  filter(toxicity_humanbee_cat!="") %>%
+  filter(measure == "APPLICATIONS, MEASURED IN LB")
+uii <- fluidPage(
+  ggplot(data = toxicity_val,
+  aes(x = long, y = lat,
+  group = group, fill = value))+
+  geom_polygon(color = "gray90", size = 0.1) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  ggtitle("Map-average usaged of toxins")
+)
+server <- function(input, output, session) {
+}    
+shinyApp(uii, server)
